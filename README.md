@@ -50,6 +50,12 @@ Walkthrough of all user stories:
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
+Add:
+- Installation instructions
+- A description of the project
+- Add a LICENSE to the repository
+- Add a acknowledging the open-source libraries used
+
 ### Next steps
 
 - Check out `BusinessesViewController.swift` to see how to use the `Business` model.
