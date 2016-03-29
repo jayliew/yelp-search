@@ -2,8 +2,6 @@
 
 This is a headless example of how to implement an OAuth 1.0a Yelp API client. The Yelp API provides an application token that allows applications to make unauthenticated requests to their search API.
 
-This is an Android demo application for displaying the latest box office movies using the [RottenTomatoes API](http://www.rottentomatoes.com/). See the [RottenTomatoes Networking Tutorial](http://guides.thecodepath.com/android/RottenTomatoes-Networking-Tutorial) on our cliffnotes for a step-by-step tutorial.
-
 Time spent: 5 hours spent in total
 
 Completed user stories:
@@ -44,45 +42,10 @@ Notes:
 
 Spent some time making the UI work across multiple phone resolutions by playing around with the RelativeLayout.
 
+- Installation instructions
+
 Walkthrough of all user stories:
 
 ![Video Walkthrough](anim_rotten_tomatoes.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
-
-Add:
-- Installation instructions
-- A description of the project
-- Add a LICENSE to the repository
-- Add a acknowledging the open-source libraries used
-
-### Next steps
-
-- Check out `BusinessesViewController.swift` to see how to use the `Business` model.
-
-### Sample request
-
-**Basic search with query**
-
-```
-Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
-    self.businesses = businesses
-
-    for business in businesses {
-        print(business.name!)
-        print(business.address!)
-    }
-})
-```
-
-**Advanced search with categories, sort, and deal filters**
-
-```
-Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
-
-    for business in businesses {
-        print(business.name!)
-        print(business.address!)
-    }
-}
-```
