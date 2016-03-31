@@ -8,11 +8,12 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate {
 
     // MARK: Properties
     
     var businesses: [Business]!
+    var isMoreDataLoading = false
     
     // MARK: Outlets
     
@@ -25,7 +26,9 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.dataSource = self
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 110
-        
+   
+        loadDataFromNetwork()
+/*
         Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
             self.tableView.reloadData()
@@ -35,6 +38,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
                 print(business.address!)
             }
         })
+ */
 
 /* Example of Yelp search with more search options specified
         Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
@@ -46,6 +50,45 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             }
         }
 */
+    }
+    
+    func loadDataFromNetwork(){
+        var offset = 0
+        if let _ = businesses?.count {
+            offset = businesses!.count
+        }
+
+        Business.searchWithTerm("Thai", offset: offset, completion: { (businesses: [Business]!, error: NSError!) -> Void in
+            
+            if let _ = self.businesses?.count {
+                self.businesses.appendContentsOf(businesses)
+            }else{
+                self.businesses = businesses
+            }
+            
+            self.isMoreDataLoading = false
+            
+            self.tableView.reloadData()
+            
+            for business in businesses {
+                print(business.name!)
+                print(business.address!)
+            }
+        })
+    }
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if(!isMoreDataLoading){
+            // Calculate the position of one screen length before the bottom of the results
+            let scrollViewContentHeight = tableView.contentSize.height
+            let scrollOffsetThreshold = scrollViewContentHeight - tableView.bounds.size.height
+            
+            if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
+                isMoreDataLoading = true
+                
+                loadDataFromNetwork()
+            }
+        }
     }
 
     // MARK: UITableViewDelegate

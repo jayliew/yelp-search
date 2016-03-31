@@ -8,15 +8,15 @@ Completed user stories:
 
 * [ ] Search results page
 
-  * [ ] Table rows should be dynamic height according to the content height.
+  * [x] Table rows should be dynamic height according to the content height.
 
-  * [ ] Custom cells should have the proper Auto Layout constraints.
+  * [x] Custom cells should have the proper Auto Layout constraints.
 
   * [ ] Search bar should be in the navigation bar (doesn't have to expand to show location like the real Yelp app does).
 
     * Hint: This is just a UISearchBar that is set as the navigationItem.titleView
 
-  * [ ] Optional: Infinite scroll for restaurant results
+  * [x] Optional: Infinite scroll for restaurant results
 
   * [ ] Optional: Implement map view of restaurant results
 
