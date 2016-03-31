@@ -14,6 +14,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     var businesses: [Business]!
     var isMoreDataLoading = false
+    var loadingMoreView:InfiniteScrollActivityView?
     
     // MARK: Outlets
     
@@ -27,19 +28,18 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 110
    
+        // Set up Infinite Scroll loading indicator
+        let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
+        loadingMoreView = InfiniteScrollActivityView(frame: frame)
+        loadingMoreView!.hidden = true
+        tableView.addSubview(loadingMoreView!)
+        
+        var insets = tableView.contentInset;
+        insets.bottom += InfiniteScrollActivityView.defaultHeight;
+        tableView.contentInset = insets
+        
         loadDataFromNetwork()
-/*
-        Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
-            self.businesses = businesses
-            self.tableView.reloadData()
-            
-            for business in businesses {
-                print(business.name!)
-                print(business.address!)
-            }
-        })
- */
-
+        
 /* Example of Yelp search with more search options specified
         Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
@@ -55,12 +55,13 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     func loadDataFromNetwork(){
         var offset = 0
         if let _ = businesses?.count {
+            // increaset offset for subsequent API calls to Yelp
             offset = businesses!.count
         }
 
         Business.searchWithTerm("Thai", offset: offset, completion: { (businesses: [Business]!, error: NSError!) -> Void in
-            
             if let _ = self.businesses?.count {
+                // append results for subsequent API calls to Yelp
                 self.businesses.appendContentsOf(businesses)
             }else{
                 self.businesses = businesses
@@ -68,6 +69,9 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             
             self.isMoreDataLoading = false
             
+            // Stop the loading indicator
+            self.loadingMoreView!.stopAnimating()
+
             self.tableView.reloadData()
             
             for business in businesses {
@@ -77,7 +81,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         })
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    func scrollViewDidScroll(scrollView: UIScrollView) { // for infinite scroll
         if(!isMoreDataLoading){
             // Calculate the position of one screen length before the bottom of the results
             let scrollViewContentHeight = tableView.contentSize.height
@@ -86,6 +90,11 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
                 isMoreDataLoading = true
                 
+                // Update position of loadingMoreView, and start loading indicator
+                let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
+                loadingMoreView?.frame = frame
+                loadingMoreView!.startAnimating()
+
                 loadDataFromNetwork()
             }
         }
@@ -99,7 +108,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         }
         return 0
     }
-    
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("BusinessCell") as! BusinessCell
@@ -123,5 +131,40 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         // Pass the selected object to the new view controller.
     }
     */
+}
 
+class InfiniteScrollActivityView: UIView {
+    var activityIndicatorView: UIActivityIndicatorView = UIActivityIndicatorView()
+    static let defaultHeight:CGFloat = 60.0
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupActivityIndicator()
+    }
+    
+    override init(frame aRect: CGRect) {
+        super.init(frame: aRect)
+        setupActivityIndicator()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        activityIndicatorView.center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2)
+    }
+    
+    func setupActivityIndicator() {
+        activityIndicatorView.activityIndicatorViewStyle = .Gray
+        activityIndicatorView.hidesWhenStopped = true
+        self.addSubview(activityIndicatorView)
+    }
+    
+    func stopAnimating() {
+        self.activityIndicatorView.stopAnimating()
+        self.hidden = true
+    }
+    
+    func startAnimating() {
+        self.hidden = false
+        self.activityIndicatorView.startAnimating()
+    }
 }
