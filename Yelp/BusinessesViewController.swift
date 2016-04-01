@@ -8,13 +8,15 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UISearchResultsUpdating {
 
     // MARK: Properties
     
     var businesses: [Business]!
     var isMoreDataLoading = false
     var loadingMoreView:InfiniteScrollActivityView?
+    var filteredData: [Business]?
+    var searchController: UISearchController?
     
     // MARK: Outlets
     
@@ -22,6 +24,22 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Initializing with searchResultsController set to nil means that
+        // searchController will use this view controller to display the search results
+        searchController = UISearchController(searchResultsController: nil)
+        searchController!.searchResultsUpdater = self
+        
+        // If we are using this same view controller to present the results
+        // dimming it out wouldn't make sense.  Should set probably only set
+        // this to yes if using another controller to display the search results.
+        searchController!.dimsBackgroundDuringPresentation = false
+
+        searchController!.searchBar.sizeToFit()
+        tableView.tableHeaderView = searchController!.searchBar
+        
+        // Sets this view controller as presenting view controller for the search interface
+        definesPresentationContext = true
 
         tableView.delegate = self
         tableView.dataSource = self
@@ -51,6 +69,16 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         }
 */
     }
+
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        if let searchText = searchController.searchBar.text {
+            filteredData = searchText.isEmpty ? businesses : businesses.filter({(businessInfo: Business) -> Bool in
+                return businessInfo.name!.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+            })
+            
+            tableView.reloadData()
+        }
+    }
     
     func loadDataFromNetwork(){
         var offset = 0
@@ -67,17 +95,13 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
                 self.businesses = businesses
             }
             
+            self.filteredData = businesses
             self.isMoreDataLoading = false
             
             // Stop the loading indicator
             self.loadingMoreView!.stopAnimating()
 
             self.tableView.reloadData()
-            
-            for business in businesses {
-                print(business.name!)
-                print(business.address!)
-            }
         })
     }
     
@@ -103,8 +127,8 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     // MARK: UITableViewDelegate
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if businesses != nil {
-            return businesses!.count
+        if filteredData != nil {
+            return filteredData!.count
         }
         return 0
     }
@@ -112,7 +136,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("BusinessCell") as! BusinessCell
         
-        cell.business = businesses[indexPath.row]
+        cell.business = filteredData![indexPath.row]
     
         return cell
     }

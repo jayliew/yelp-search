@@ -12,7 +12,7 @@ Completed user stories:
 
   * [x] Custom cells should have the proper Auto Layout constraints.
 
-  * [ ] Search bar should be in the navigation bar (doesn't have to expand to show location like the real Yelp app does).
+  * [x] Search bar should be in the navigation bar (doesn't have to expand to show location like the real Yelp app does).
 
     * Hint: This is just a UISearchBar that is set as the navigationItem.titleView
 
