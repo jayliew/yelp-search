@@ -126,7 +126,7 @@
                     <navigationItem key="navigationItem" title="Yelp" id="qGM-ew-5qK">
                         <barButtonItem key="rightBarButtonItem" title="Map" id="1k4-vz-Lnw">
                             <connections>
-                                <segue destination="jhf-aB-eMs" kind="modal" id="cld-8U-2V2"/>
+                                <segue destination="jhf-aB-eMs" kind="modal" identifier="mapSegue" id="cld-8U-2V2"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

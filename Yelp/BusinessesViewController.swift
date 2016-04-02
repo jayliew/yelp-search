@@ -137,6 +137,8 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         let cell = tableView.dequeueReusableCellWithIdentifier("BusinessCell") as! BusinessCell
         
         cell.business = filteredData![indexPath.row]
+        
+//        print(cell.business.name! + " " + String(cell.business.longitude!))
     
         return cell
     }
@@ -146,15 +148,17 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         // Dispose of any resources that can be recreated.
     }
 
-    /*
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "mapSegue" {
+            let navController = segue.destinationViewController as! UINavigationController
+            let mapVC = navController.topViewController as! MapViewController
+            
+            mapVC.locations = self.filteredData
+        }
     }
-    */
+
 }
 
 class InfiniteScrollActivityView: UIView {

@@ -10,11 +10,14 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class MapViewController: UIViewController, CLLocationManagerDelegate {
+class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
 
     // MARK: Properties
     
     var locationManager: CLLocationManager!
+    var locations: [Business]?
+    var lastLocation : CLLocationCoordinate2D!
+    var initialLocationSet = false
     
     // MARK: Outlets
     
@@ -24,19 +27,35 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        mapView.delegate = self
+        
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         locationManager.distanceFilter = 200
         locationManager.requestWhenInUseAuthorization()
         
-        let centerLocation = CLLocation(latitude: 37.37503, longitude: -122.0559737)
-        goToLocation(centerLocation)
+        if let places = locations {
+            for place in places{
+                addAnnotationAtCoordinate(place.name!,
+                                          coordinate: CLLocationCoordinate2D(latitude: place.latitude! as CLLocationDegrees,
+                                            longitude: place.longitude! as CLLocationDegrees))
+            }//for
+        }// if let
         
-        let long = -122.0559737 as CLLocationDegrees
-        let lat = 37.37503 as CLLocationDegrees
-        
-        addAnnotationAtCoordinate(CLLocationCoordinate2D(latitude: lat, longitude: long))
+    } // viewDidLoad
+    
+    func mapView(mapView: MKMapView, didUpdateUserLocation userLocation: MKUserLocation) {
+        let annotations = [mapView.userLocation]
+        if !initialLocationSet{ // only zoom in on initial location once
+            mapView.showAnnotations(annotations, animated: true)
+            initialLocationSet = true
+        }
+    }
+    
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+        let annotations = [mapView.userLocation, view.annotation!]
+        mapView.showAnnotations(annotations, animated: true)
     }
     
     func goToLocation(location: CLLocation){
@@ -45,10 +64,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         mapView.setRegion(region, animated: false)
     }
 
-    func addAnnotationAtCoordinate(coordinate: CLLocationCoordinate2D) {
+    func addAnnotationAtCoordinate(name: String, coordinate: CLLocationCoordinate2D) {
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinate
-        annotation.title = "Sup beyatch"
+        annotation.title = name
         mapView.addAnnotation(annotation)
     }
 
@@ -57,14 +76,17 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             locationManager.startUpdatingLocation()
         }
     }
-    
+
+/*
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+     // this is to continuously center map on user's location
         if let location = locations.first {
             let span = MKCoordinateSpanMake(0.1, 0.1)
             let region = MKCoordinateRegionMake(location.coordinate, span)
             mapView.setRegion(region, animated: false)
         }
     }
+ */
     
     @IBAction func backToPreviousViewController(sender: AnyObject) {
         dismissViewControllerAnimated(true, completion: nil)
