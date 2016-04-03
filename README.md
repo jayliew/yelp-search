@@ -18,7 +18,7 @@ Completed user stories:
 
   * [x] Optional: Infinite scroll for restaurant results
 
-  * [ ] Optional: Implement map view of restaurant results
+  * [x] Optional: Implement map view of restaurant results
 
 * [ ] Filter page. Unfortunately, not all the filters in the real Yelp App, are supported in the Yelp API.
 
