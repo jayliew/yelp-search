@@ -3,10 +3,15 @@
 //  Yelp
 //
 //  Created by Timothy Lee on 4/23/15.
+//  Updated by Jay Liew
 //  Copyright (c) 2015 Timothy Lee. All rights reserved.
 //
 
 import UIKit
+
+class Settings {
+    var offersOnly = true
+}
 
 class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UISearchResultsUpdating {
 
@@ -17,6 +22,12 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     var loadingMoreView:InfiniteScrollActivityView?
     var filteredData: [Business]?
     var searchController: UISearchController?
+    var settings: Settings = Settings(){
+        didSet{
+            businesses = []
+            loadDataFromNetwork()
+        }
+    }
     
     // MARK: Outlets
     
@@ -58,16 +69,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         
         loadDataFromNetwork()
         
-/* Example of Yelp search with more search options specified
-        Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
-            self.businesses = businesses
-            
-            for business in businesses {
-                print(business.name!)
-                print(business.address!)
-            }
-        }
-*/
     }
 
     func updateSearchResultsForSearchController(searchController: UISearchController) {
@@ -87,7 +88,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             offset = businesses!.count
         }
 
-        Business.searchWithTerm("Thai", offset: offset, completion: { (businesses: [Business]!, error: NSError!) -> Void in
+        Business.searchWithTerm("Thai", offset: offset, deals: settings.offersOnly, completion: { (businesses: [Business]!, error: NSError!) -> Void in
             if let _ = self.businesses?.count {
                 // append results for subsequent API calls to Yelp
                 self.businesses.appendContentsOf(businesses)
@@ -103,7 +104,19 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
 
             self.tableView.reloadData()
         })
-    }
+        
+        /* Example of Yelp search with more search options specified
+         Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
+         self.businesses = businesses
+         
+         for business in businesses {
+         print(business.name!)
+         print(business.address!)
+         }
+         }
+         */
+
+    }//loadDataFromNetwork
     
     func scrollViewDidScroll(scrollView: UIScrollView) { // for infinite scroll
         if(!isMoreDataLoading){
@@ -151,15 +164,29 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     // MARK: - Navigation
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "settingsSegue" {
+            let navController = segue.destinationViewController as! UINavigationController
+            let settingsVC = navController.topViewController as! SettingsTableViewController
+            // send the dest segue current settings
+            settingsVC.currentSettings = self.settings
+        }
+        
         if segue.identifier == "mapSegue" {
             let navController = segue.destinationViewController as! UINavigationController
             let mapVC = navController.topViewController as! MapViewController
-            
+            // send the dest segue the business locations (as per search)
             mapVC.locations = self.filteredData
         }
-    }
+    } // prepareForSegue
 
-}
+    @IBAction func didSaveSettings(segue: UIStoryboardSegue) {
+        print("settings saved")
+        if let settingsVC = segue.sourceViewController as? SettingsTableViewController {
+            self.settings = settingsVC.settingsFromTableData()
+        }
+    } // didSaveSettings
+    
+} // BusinessViewController
 
 class InfiniteScrollActivityView: UIView {
     var activityIndicatorView: UIActivityIndicatorView = UIActivityIndicatorView()

@@ -3,6 +3,7 @@
 //  Yelp
 //
 //  Created by Timothy Lee on 9/19/14.
+//  Modified by Jay Liew
 //  Copyright (c) 2014 Timothy Lee. All rights reserved.
 //
 
@@ -51,15 +52,17 @@ class YelpClient: BDBOAuth1RequestOperationManager {
         self.requestSerializer.saveAccessToken(token)
     }
     
-    func searchWithTerm(term: String, offset: Int, completion: ([Business]!, NSError!) -> Void) -> AFHTTPRequestOperation {
-        return searchWithTerm(term, offset: offset, sort: nil, categories: nil, deals: nil, completion: completion)
+    func searchWithTerm(term: String, offset: Int, deals: Bool, completion: ([Business]!, NSError!) -> Void) -> AFHTTPRequestOperation {
+        return searchWithTerm(term, offset: offset, sort: nil, categories: nil, deals: deals, completion: completion)
     }
     
     func searchWithTerm(term: String, offset: Int, sort: YelpSortMode?, categories: [String]?, deals: Bool?, completion: ([Business]!, NSError!) -> Void) -> AFHTTPRequestOperation {
         // For additional parameters, see http://www.yelp.com/developers/documentation/v2/search_api
 
         // Default the location to San Francisco
-        var parameters: [String : AnyObject] = ["term": term, "offset": offset, "ll": "37.37503,-122.0559737"]
+        //var parameters: [String : AnyObject] = ["term": term, "offset": offset, "ll": "37.37503,-122.0559737"]
+
+        var parameters: [String : AnyObject] = ["term": term, "offset": offset, "ll": "37.39361,-122.079011"] // mountain view
 
         if sort != nil {
             parameters["sort"] = sort!.rawValue
