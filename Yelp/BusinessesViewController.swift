@@ -11,6 +11,7 @@ import UIKit
 
 class Settings {
     var offersOnly = true
+    var sortBy = 0
 }
 
 class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UISearchResultsUpdating {
@@ -180,7 +181,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     } // prepareForSegue
 
     @IBAction func didSaveSettings(segue: UIStoryboardSegue) {
-        print("settings saved")
         if let settingsVC = segue.sourceViewController as? SettingsTableViewController {
             self.settings = settingsVC.settingsFromTableData()
         }

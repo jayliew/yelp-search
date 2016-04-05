@@ -28,7 +28,7 @@ Completed user stories:
 
   * [ ] You can use the default UISwitch for on/off states. Optional: implement a custom switch
 
-  * [ ] Clicking on the "Search" button should dismiss the filters page and trigger the search w/ the new filter settings.
+  * [x] Clicking on the "Search" button should dismiss the filters page and trigger the search w/ the new filter settings.
 
   * [ ] Optional: Distance filter should expand as in the real Yelp app.
 
