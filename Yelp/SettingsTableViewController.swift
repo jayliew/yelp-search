@@ -18,6 +18,7 @@ class SettingsTableViewController: UITableViewController {
     
     @IBOutlet var settingsTableView: UITableView!
     @IBOutlet weak var offersSwitch: UISwitch!
+    @IBOutlet weak var sortByControl: UISegmentedControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,11 +35,13 @@ class SettingsTableViewController: UITableViewController {
 
     private func initSwitches(){
         offersSwitch?.on = currentSettings.offersOnly
+        sortByControl.selectedSegmentIndex = currentSettings.sortBy
     }
     
     func settingsFromTableData() -> Settings {
         let newSettings = Settings()
         newSettings.offersOnly = offersSwitch.on
+        newSettings.sortBy = sortByControl.selectedSegmentIndex
         return newSettings
     }
     

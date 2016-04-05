@@ -10,7 +10,7 @@
 import UIKit
 
 class Settings {
-    var offersOnly = true
+    var offersOnly = false
     var sortBy = 0
 }
 
@@ -89,7 +89,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             offset = businesses!.count
         }
 
-        Business.searchWithTerm("Thai", offset: offset, deals: settings.offersOnly, completion: { (businesses: [Business]!, error: NSError!) -> Void in
+        Business.searchWithTerm("Thai", offset: offset, sort: settings.sortBy, deals: settings.offersOnly, completion: { (businesses: [Business]!, error: NSError!) -> Void in
             if let _ = self.businesses?.count {
                 // append results for subsequent API calls to Yelp
                 self.businesses.appendContentsOf(businesses)
